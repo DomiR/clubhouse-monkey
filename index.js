@@ -74,8 +74,8 @@
 					prependStoryId();
 				}
 
-				if (flags.shouldReplaceGithubButtonWithCommitMessageCopy) {
-					replaceGithubButton()
+				if (flags.shouldReplaceGithubButtonWithCommitMessageCopy) {
+					replaceGithubButton();
 				}
 			}
 		}
@@ -83,14 +83,19 @@
 		// Modal fixes
 		let checkInterval = null;
 		function updateModal() {
-			if (jQuery('#story-dialog-parent').length > 0) {
+			// Prepend `ch` to story id
+			const storyIdInput = jQuery('#story-dialog-parent .story-details .story-id input');
+			if (storyIdInput.length > 0) {
 				// we fix the id, but clubhouse will fetch and replace our fix
 				// so we also start a check interval and replace it again
+				console.log('clubhouse start modal monitoring')
 				checkInterval = setInterval(checkModalChanges, 1000);
 			} else {
+				console.log('clubhouse stop modal monitoring')
 				clearInterval(checkInterval);
 			}
 		}
+		updateModal()
 
 		// Call this observer whenever a modal is shown
 		var observer = new MutationObserver(updateModal);
