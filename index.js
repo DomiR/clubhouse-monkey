@@ -19,7 +19,7 @@
 		shouldPrefixStoryIdWithCh: true,
 
 		// Replace the github dropdown with single click copy message: "title [closes id]"
-		shouldReplaceGithubButtonWithCommitMessageCopy: true,
+		shouldreplacePermaLinkButtonWithCommitMessageCopy: true,
 		shouldLowercaseCommitMessage: true,
 	};
 
@@ -33,24 +33,41 @@
 			root.style.setProperty('--leftNavActiveBackgroundColor', '#00358E');
 			root.style.setProperty('--topNavLinkBackgroundColor', '#659BF2');
 			root.style.setProperty('--fadedTextColor', '#444');
+			root.style.setProperty('--navSearchActiveTextColor', '#265EBF');
+			root.style.setProperty('--leftNavActiveBorderColor', '#265EBF');
 		}
 
 		// When clicking github helper it should copy `${title} [closes ch${clubhhouseid}]`
-		function replaceGithubButton() {
-			const githubButton = jQuery('#story-dialog-parent .story-details #open-git-helpers-dropdown');
-			if (githubButton.length > 0) {
-				githubButton.removeAttr('data-on-click');
-				githubButton.click(() => {
-					const storyTitleNode = jQuery('#story-dialog-parent .story-details .story-name');
-					const storyTitle = storyTitleNode.text();
+		function replacePermaLinkButton() {
+			const attributeSection = jQuery('.story-attributes')
+			const permalinkTitleSection = attributeSection.find('.inline-attribute-field-name .name').first()
+			permalinkTitleSection.text('Commit Message')
 
-					const storyIdInput = jQuery('#story-dialog-parent .story-details .story-id input');
-					const storyId = storyIdInput.val();
-					const id = storyId.indexOf('ch') === -1 ? `ch{storyId}` : storyId;
-					const commitMessage = `${storyTitle} [closes ${id}]`;
-					const copyContent = flags.shouldLowercaseCommitMessage
-						? commitMessage.toLowerCase()
-						: commitMessage;
+			const permalinkTextfield = attributeSection.find('.inline-attribute-field input').first()
+			const copyButton = attributeSection.find('.attribute-toggle a').first()
+
+			// const githubButton = jQuery('#story-dialog-parent .story-details #open-git-helpers-dropdown');
+			if (permalinkTextfield.length > 0) {
+				const storyTitleNode = jQuery('#story-dialog-parent .story-details .story-name');
+				const storyTitle = storyTitleNode.text();
+
+				const storyIdInput = jQuery('#story-dialog-parent .story-details .story-id input');
+				const storyId = storyIdInput.val();
+				const id = storyId.indexOf('ch') === -1 ? `ch{storyId}` : storyId;
+				const commitMessage = `${storyTitle} [closes ${id}]`;
+				const commitMessageFormatted = flags.shouldLowercaseCommitMessage
+					? commitMessage.toLowerCase()
+					: commitMessage;
+
+
+				permalinkTextfield.val(commitMessageFormatted)
+				let lastClick = 0;
+				const copyButton = attributeSection.find('.attribute-toggle a').first()
+				copyButton.removeAttr('data-clipboard-target');
+				copyButton.click(() => {
+					let isDoubleClick = Date.now() - lastClick < 400;
+					lastClick = Date.now();
+					const copyContent = isDoubleClick ? `git commit -m "${commitMessageFormatted}"` : commitMessageFormatted;
 					navigator.clipboard.writeText(copyContent).catch(() => {});
 				});
 			}
@@ -74,8 +91,8 @@
 					prependStoryId();
 				}
 
-				if (flags.shouldReplaceGithubButtonWithCommitMessageCopy) {
-					replaceGithubButton();
+				if (flags.shouldreplacePermaLinkButtonWithCommitMessageCopy) {
+					replacePermaLinkButton();
 				}
 			}
 		}
