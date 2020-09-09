@@ -18,7 +18,7 @@
 		// Adds ch prefix to the shown id and also copies it on click
 		shouldPrefixStoryIdWithCh: true,
 
-		// Replace the github dropdown with single click copy message: "title [closes id]"
+		// Replace the github dropdown with single click copy message: "title [finishes id]"
 		shouldreplacePermaLinkButtonWithCommitMessageCopy: true,
 		shouldLowercaseCommitMessage: true,
 	};
@@ -37,7 +37,7 @@
 			root.style.setProperty('--leftNavActiveBorderColor', '#265EBF');
 		}
 
-		// When clicking github helper it should copy `${title} [closes ch${clubhhouseid}]`
+		// When clicking github helper it should copy `${title} [finishes ch${clubhhouseid}]`
 		function replacePermaLinkButton() {
 			const attributeSection = jQuery('.story-attributes')
 			const permalinkTitleSection = attributeSection.find('.inline-attribute-field-name .name').first()
@@ -54,7 +54,7 @@
 				const storyIdInput = jQuery('#story-dialog-parent .story-details .story-id input');
 				const storyId = storyIdInput.val();
 				const id = storyId.indexOf('ch') === -1 ? `ch{storyId}` : storyId;
-				const commitMessage = `${storyTitle} [closes ${id}]`;
+				const commitMessage = `${storyTitle} [finishes ${id}]`;
 				const commitMessageFormatted = flags.shouldLowercaseCommitMessage
 					? commitMessage.toLowerCase()
 					: commitMessage;
