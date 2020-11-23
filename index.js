@@ -55,9 +55,10 @@
 				const storyId = storyIdInput.val();
 				const id = storyId.indexOf('ch') === -1 ? `ch{storyId}` : storyId;
 				const commitMessage = `${storyTitle} [finishes ${id}]`;
-				const commitMessageFormatted = flags.shouldLowercaseCommitMessage
+				const commitMessageLower = flags.shouldLowercaseCommitMessage
 					? commitMessage.toLowerCase()
-					: commitMessage;
+					: commitMessage
+				const commitMessageFormatted = commitMessageLower.replace(/"/g, "'");
 
 
 				permalinkTextfield.val(commitMessageFormatted)
