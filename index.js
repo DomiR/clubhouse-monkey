@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Clubhouse improvements
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.2
 // @description  Improve clubhouse
 // @author       Dominique
 // @match        https://app.clubhouse.io/thingos/*
@@ -18,9 +18,10 @@
 		// Adds ch prefix to the shown id and also copies it on click
 		shouldPrefixStoryIdWithCh: true,
 
-		// Replace the github dropdown with single click copy message: "title [finishes id]"
-		shouldreplacePermaLinkButtonWithCommitMessageCopy: true,
+		// Replace the github dropdown with single click copy message: "title [closes id]"
+		shouldReplacePermaLinkButtonWithCommitMessageCopy: true,
 		shouldLowercaseCommitMessage: true,
+		shouldReplaceEpicLinkWithMilestone: true,
 	};
 
 	jQuery(document).ready(function () {
@@ -37,14 +38,16 @@
 			root.style.setProperty('--leftNavActiveBorderColor', '#265EBF');
 		}
 
-		// When clicking github helper it should copy `${title} [finishes ch${clubhhouseid}]`
+		// When clicking github helper it should copy `${title} [closes ch${clubhhouseid}]`
 		function replacePermaLinkButton() {
-			const attributeSection = jQuery('.story-attributes')
-			const permalinkTitleSection = attributeSection.find('.inline-attribute-field-name .name').first()
-			permalinkTitleSection.text('Commit Message')
+			const attributeSection = jQuery('.story-attributes');
+			const permalinkTitleSection = attributeSection
+				.find('.inline-attribute-field-name .name')
+				.first();
+			permalinkTitleSection.text('Commit Message');
 
-			const permalinkTextfield = attributeSection.find('.inline-attribute-field input').first()
-			const copyButton = attributeSection.find('.attribute-toggle a').first()
+			const permalinkTextfield = attributeSection.find('.inline-attribute-field input').first();
+			const copyButton = attributeSection.find('.attribute-toggle a').first();
 
 			// const githubButton = jQuery('#story-dialog-parent .story-details #open-git-helpers-dropdown');
 			if (permalinkTextfield.length > 0) {
@@ -54,24 +57,46 @@
 				const storyIdInput = jQuery('#story-dialog-parent .story-details .story-id input');
 				const storyId = storyIdInput.val();
 				const id = storyId.indexOf('ch') === -1 ? `ch{storyId}` : storyId;
-				const commitMessage = `${storyTitle} [finishes ${id}]`;
+				const commitMessage = `${storyTitle} [closes ${id}]`;
 				const commitMessageLower = flags.shouldLowercaseCommitMessage
 					? commitMessage.toLowerCase()
-					: commitMessage
+					: commitMessage;
 				const commitMessageFormatted = commitMessageLower.replace(/"/g, "'");
 
-
-				permalinkTextfield.val(commitMessageFormatted)
+				permalinkTextfield.val(commitMessageFormatted);
 				let lastClick = 0;
-				const copyButton = attributeSection.find('.attribute-toggle a').first()
+				const copyButton = attributeSection.find('.attribute-toggle a').first();
 				copyButton.removeAttr('data-clipboard-target');
 				copyButton.click(() => {
 					let isDoubleClick = Date.now() - lastClick < 400;
 					lastClick = Date.now();
-					const copyContent = isDoubleClick ? `git commit -m "${commitMessageFormatted}"` : commitMessageFormatted;
+					const copyContent = isDoubleClick
+						? `git commit -m "${commitMessageFormatted}"`
+						: commitMessageFormatted;
 					navigator.clipboard.writeText(copyContent).catch(() => {});
 				});
 			}
+		}
+
+		function addStoryCheckout() {
+			// check if id is already available and get those instead
+
+			// not available, so retrieve them from scratch
+			const permalinkTitleSection = attributeSection
+				.find('.inline-attribute-field-name .name')
+				.first();
+			const permalinkTextfield = attributeSection.find('.inline-attribute-field input').first();
+			const copyButton = attributeSection.find('.attribute-toggle a').first();
+
+			const checkoutTitle = permalinkTitleSection.clone();
+			const checkoutTextfield = permalinkTextfield.clone();
+			const checkoutButton = copyButton.clone();
+
+			// set element ids for getting them again
+
+			// inset at correct position
+
+			// set data
 		}
 
 		// Setup modal change listener
@@ -92,7 +117,7 @@
 					prependStoryId();
 				}
 
-				if (flags.shouldreplacePermaLinkButtonWithCommitMessageCopy) {
+				if (flags.shouldReplacePermaLinkButtonWithCommitMessageCopy) {
 					replacePermaLinkButton();
 				}
 			}
@@ -101,19 +126,23 @@
 		// Modal fixes
 		let checkInterval = null;
 		function updateModal() {
+			if (flags.shouldReplaceEpicLinkWithMilestone) {
+				replaceEpicWithMilestone();
+			}
+
 			// Prepend `ch` to story id
 			const storyIdInput = jQuery('#story-dialog-parent .story-details .story-id input');
 			if (storyIdInput.length > 0) {
 				// we fix the id, but clubhouse will fetch and replace our fix
 				// so we also start a check interval and replace it again
-				console.log('clubhouse start modal monitoring')
+				console.log('clubhouse start modal monitoring');
 				checkInterval = setInterval(checkModalChanges, 1000);
 			} else {
-				console.log('clubhouse stop modal monitoring')
+				console.log('clubhouse stop modal monitoring');
 				clearInterval(checkInterval);
 			}
 		}
-		updateModal()
+		updateModal();
 
 		// Call this observer whenever a modal is shown
 		var observer = new MutationObserver(updateModal);
