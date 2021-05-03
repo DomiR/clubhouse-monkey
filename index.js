@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Clubhouse improvements
 // @namespace    http://tampermonkey.net/
-// @version      0.2
+// @version      0.3
 // @description  Improve clubhouse
 // @author       Dominique
 // @match        https://app.clubhouse.io/thingos/*
@@ -36,6 +36,19 @@
 			root.style.setProperty('--fadedTextColor', '#444');
 			root.style.setProperty('--navSearchActiveTextColor', '#265EBF');
 			root.style.setProperty('--leftNavActiveBorderColor', '#265EBF');
+		}
+
+		// Replace epic link with milestone
+		function replaceEpicWithMilestone() {
+			const milestoneLink = jQuery(
+				'#epicMilestoneControl > div.details-stat-value > div.attribute-toggle > a'
+			);
+			const milestoneText = jQuery(
+				'#epicMilestoneControl > div.details-stat-value > div.attribute.editable-attribute.attribute-has-toggle.has-icon-on-left.condensed > span'
+			);
+			const epicLink = jQuery('#epics div.breadcrumbs > a');
+			epicLink.text(milestoneText.text());
+			epicLink.attr('href', milestoneLink.attr('href'));
 		}
 
 		// When clicking github helper it should copy `${title} [closes ch${clubhhouseid}]`
