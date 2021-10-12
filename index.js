@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Shortcut improvements
 // @namespace    http://tampermonkey.net/
-// @version      0.3
+// @version      0.4
 // @description  Improve shortcut
 // @author       Dominique
-// @match        https://app.shortcut.io/thingos/*
+// @match        https://app.shortcut.com/thingos/*
 // @grant        none
 // ==/UserScript==
 
