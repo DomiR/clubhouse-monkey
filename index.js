@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name         Clubhouse improvements
+// @name         Shortcut improvements
 // @namespace    http://tampermonkey.net/
 // @version      0.3
-// @description  Improve clubhouse
+// @description  Improve shortcut
 // @author       Dominique
-// @match        https://app.clubhouse.io/thingos/*
+// @match        https://app.shortcut.io/thingos/*
 // @grant        none
 // ==/UserScript==
 
