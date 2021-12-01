@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Shortcut improvements
+// @name         Clubhouse improvements
 // @namespace    http://tampermonkey.net/
-// @version      0.4
-// @description  Improve shortcut
+// @version      0.5
+// @description  Improve clubhouse
 // @author       Dominique
 // @match        https://app.shortcut.com/thingos/*
 // @grant        none
@@ -54,15 +54,14 @@
 		// When clicking github helper it should copy `${title} [closes ch${clubhhouseid}]`
 		function replacePermaLinkButton() {
 			const attributeSection = jQuery('.story-attributes');
-			const permalinkTitleSection = attributeSection
-				.find('.inline-attribute-field-name .name')
-				.first();
-			permalinkTitleSection.text('Commit Message');
+			const permaLinkSection = attributeSection.find('.attribute').eq(1);
 
-			const permalinkTextfield = attributeSection.find('.inline-attribute-field input').first();
-			const copyButton = attributeSection.find('.attribute-toggle a').first();
+			const permalinkTitle = permaLinkSection.find('.name');
+			permalinkTitle.text('Commit Message');
 
-			// const githubButton = jQuery('#story-dialog-parent .story-details #open-git-helpers-dropdown');
+			const permalinkTextfield = permaLinkSection.find('input');
+			const copyButton = permaLinkSection.find('button');
+
 			if (permalinkTextfield.length > 0) {
 				const storyTitleNode = jQuery('#story-dialog-parent .story-details .story-name');
 				const storyTitle = storyTitleNode.text();
@@ -76,11 +75,14 @@
 					: commitMessage;
 				const commitMessageFormatted = commitMessageLower.replace(/"/g, "'");
 
+				if (permalinkTextfield.val() == commitMessageFormatted) return;
 				permalinkTextfield.val(commitMessageFormatted);
+
 				let lastClick = 0;
-				const copyButton = attributeSection.find('.attribute-toggle a').first();
 				copyButton.removeAttr('data-clipboard-target');
-				copyButton.click(() => {
+				copyButton.click(evt => {
+					evt.preventDefault();
+					evt.stopPropagation();
 					let isDoubleClick = Date.now() - lastClick < 400;
 					lastClick = Date.now();
 					const copyContent = isDoubleClick
@@ -123,9 +125,11 @@
 
 		// Check modal changes
 		function checkModalChanges() {
+			console.log('check model change');
 			const storyIdInput = jQuery('#story-dialog-parent .story-details .story-id input');
 			const storyId = storyIdInput.val();
 			if (typeof storyId === 'string' && storyId.indexOf('ch') === -1) {
+				console.log('found modal');
 				if (flags.shouldPrefixStoryIdWithCh) {
 					prependStoryId();
 				}
