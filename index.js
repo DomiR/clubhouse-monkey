@@ -153,17 +153,10 @@
 			if (storyIdInput.length > 0) {
 				// we fix the id, but clubhouse will fetch and replace our fix
 				// so we also start a check interval and replace it again
-				console.log('clubhouse start modal monitoring');
-				checkInterval = setInterval(checkModalChanges, 1000);
-			} else {
-				console.log('clubhouse stop modal monitoring');
-				clearInterval(checkInterval);
+				checkModalChanges();
 			}
 		}
-		updateModal();
 
-		// Call this observer whenever a modal is shown
-		var observer = new MutationObserver(updateModal);
-		observer.observe(document.body, { subtree: false, attributes: true });
+		setInterval(updateModal, 1000);
 	});
 })();
