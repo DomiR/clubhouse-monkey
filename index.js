@@ -4,6 +4,7 @@
 // @version      0.5
 // @description  Improve clubhouse
 // @author       Dominique
+// @license      MIT
 // @match        https://app.shortcut.com/thingos/*
 // @grant        none
 // ==/UserScript==
